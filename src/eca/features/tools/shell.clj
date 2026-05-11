@@ -5,6 +5,7 @@
    [clojure.string :as string]
    [eca.config :as config]
    [eca.features.background-tasks :as bg]
+   [eca.features.tools.shell-parser :as shell-parser]
    [eca.features.tools.util :as tools.util]
    [eca.logger :as logger]
    [eca.messenger :as messenger]
@@ -19,8 +20,13 @@
 
 (defmethod tools.util/tool-call-details-before-invocation :shell_command
   [_name arguments _server _ctx]
-  (when (get arguments "background")
-    {:background true}))
+  (let [command (get arguments "command")
+        parsed (when command
+                 (shell-parser/parse command))]
+    (if parsed
+      (assoc parsed :type :shellCommand)
+      (when (get arguments "background")
+        {:background true}))))
 
 (defn start-shell-process!
   "Start a shell process, returning the process object for deref/management.
