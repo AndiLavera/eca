@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Shell commands in approval dialogs are now parsed via `shfmt` (when installed) to show a structured breakdown of each command and its arguments. Raw command string is shown as fallback when `shfmt` is not available.
+
 ## 0.133.3
 
 - Add unit and integration tests covering parent↔subagent end-to-end communication so regressions like the v0.133.1 spawn-agent breakage are caught automatically.

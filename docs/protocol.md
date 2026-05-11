@@ -1113,7 +1113,7 @@ interface ChatToolCallRejectedContent {
 
 type ToolCallOrigin = 'mcp' | 'native' | 'server' | 'unknown';
 
-type ToolCallDetails = FileChangeDetails | JsonOutputsDetails | SubagentDetails | TaskDetails;
+type ToolCallDetails = FileChangeDetails | JsonOutputsDetails | SubagentDetails | TaskDetails | ShellCommandDetails;
 
 interface FileChangeDetails {
     type: 'fileChange';
@@ -1255,6 +1255,35 @@ interface TaskItem {
      * Only present when the task has dependencies.
      */
     blockedBy?: number[];
+}
+
+/**
+ * Shell command breakdown returned by the shell_command tool.
+ * Parsed via shfmt when available; falls back to nil (raw command display) otherwise.
+ */
+interface ShellCommandDetails {
+    type: 'shellCommand';
+
+    /**
+     * The list of individual commands extracted from the shell invocation.
+     * Chained commands (&&, ||, ;, |) are split into separate entries.
+     */
+    commands: ShellCommandBreakdown[];
+}
+
+interface ShellCommandBreakdown {
+    /**
+     * The command being executed, e.g. "ls", "grep", "cd".
+     */
+    command: string;
+
+    /**
+     * All arguments to the command, including flags.
+     * e.g. ["-la", "*.clj"] for "ls -la *.clj".
+     * Redirections (> file, 2>&1) are not included since shfmt
+     * parses them as separate AST nodes.
+     */
+    args: string[];
 }
 
 /**
